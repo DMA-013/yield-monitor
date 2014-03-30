@@ -6,9 +6,6 @@
     <string name="hello_world">Hello world!</string>
     <string name="action_statistics">Statistics</string>
     <string name="action_undo">Undo</string>
-    <string name="action_dial_pad">Dial</string>
-    <string name="Area">Area</string>
-    <string name="Nothing">Nothing</string>
-
+    <string name="action_area">Area</string>
 
 </resources>
