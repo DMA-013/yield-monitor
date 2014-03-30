@@ -9,5 +9,13 @@
         android:orderInCategory="100"
         android:showAsAction="never"
         android:title="@string/action_settings"/>
+    
+    <item
+        android:id="@+id/action_dial_pad"
+        android:icon="@drawable/ic_action_dial_pad"
+        android:title="@string/action_dial_pad"
+        android:showAsAction="always"/>
+
+
 
 </menu>
