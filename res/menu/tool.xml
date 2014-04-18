@@ -1,0 +1,33 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+<item
+    android:id="@+id/calculate"
+    android:icon="@drawable/ic_calculate"
+    android:title="@string/calculate"
+    android:showAsAction="always" >
+    <menu>
+       <item android:orderInCategory="1"
+          android:id="@+id/average"
+          android:showAsAction="ifRoom|withText"
+          android:title="@string/average" />
+       <item
+          android:orderInCategory="2"
+          android:id="@+id/standard_deviation"
+          android:showAsAction="ifRoom|withText"
+          android:title="@string/standard_deviation" />
+       <item
+          android:orderInCategory="3"
+          android:id="@+id/variance"
+          android:showAsAction="ifRoom|withText"
+          android:title="@string/variance" />
+       <item 
+          android:orderInCategory="4"
+          android:id="@+id/action_pixel"
+          android:showAsAction="ifRoom|withText"
+          android:title="@string/action_pixel" />
+
+       
+    </menu>
+    
+ </item>
+</menu>
