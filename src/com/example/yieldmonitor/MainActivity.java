@@ -1,11 +1,11 @@
 package com.example.yieldmonitor;
 
 import java.util.ArrayList;
+//import java.util.HashMap;
 import java.lang.String;
 
 import android.os.Bundle;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -26,10 +26,14 @@ import com.google.maps.android.PolyUtil;
 import com.google.maps.android.SphericalUtil;
 
 
+
 public class MainActivity extends FragmentActivity {
 	
 	static final double EARTH_RADIUS = 6371009;
 	private static final String TAG = "MyActivity";
+	private static final String Value = "PIXEL";
+	
+	
 	
 	GoogleMap googleMap;
     ArrayList<LatLng> points; //Vertices of the polygon to be plotted
@@ -43,20 +47,21 @@ public class MainActivity extends FragmentActivity {
     
     TextView AreaTextView;
     TextView AverageText;
+    TextView VarianceText;
+    TextView Std_DevText;
+    TextView ModeText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        
 
         points = new ArrayList<LatLng>();
         polylines = new ArrayList<Polyline>();
-        GroundOverlayOptions overlay = new GroundOverlayOptions().image(BitmapDescriptorFactory.fromResource(R.drawable.w_overlay)).anchor(0, 0);
+        GroundOverlayOptions overlay = new GroundOverlayOptions().image(BitmapDescriptorFactory.fromResource(R.drawable.yield_overlay)).anchor(0, 0);
         overlay.position(overlayLocation, 860f, 650f);
         
-        //GroundOverlayOptions w_image = new GroundOverlayOptions().image(BitmapDescriptorFactory.fromResource(R.drawable.w_overlay))
-        //		.position(overlayLocation, 860f, 650f).transparency(0.5f);
-
         //Getting reference to the SupportMapFragment of activity_main.xml
         SupportMapFragment fm = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         googleMap = fm.getMap(); //Getting GoogleMap object from the fragment    
@@ -65,6 +70,10 @@ public class MainActivity extends FragmentActivity {
         
         AreaTextView = (TextView)findViewById(R.id.areaValue);
         AverageText = (TextView)findViewById(R.id.average);
+        Std_DevText = (TextView)findViewById(R.id.standard_deviation);
+        VarianceText = (TextView)findViewById(R.id.variance);
+        ModeText = (TextView)findViewById(R.id.mode);
+        
         
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(image_test, 13));      
         
@@ -120,6 +129,9 @@ public class MainActivity extends FragmentActivity {
                 	iMarker.remove(); fMarker.remove();
                 	AreaTextView.setText("");
                 	AverageText.setText("");
+                	Std_DevText.setText("");
+           	        VarianceText.setText("");
+           	        //pixels.fill(coun)
                 	for(Polyline line: polylines) {
                 		line.remove();
                 	}
@@ -188,6 +200,9 @@ public class MainActivity extends FragmentActivity {
         });
     }
     
+   
+    
+    
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         /*Inflate the menu; this adds items to the action bar if it is present.*/
@@ -209,11 +224,18 @@ public class MainActivity extends FragmentActivity {
     	     points.remove(points.size() - 1);
     	     fMarker.setPosition(points.get(points.size() - 1));
     	     AreaTextView.setText("");
+    	     AverageText.setText("");
+    	     Std_DevText.setText("");
+    	     VarianceText.setText("");
+    	     
     	 } else if (polylines.size() == 0) {
     		 if (points.size() > 0) {
     		 points.remove(points.size() - 1);
              iMarker.remove(); fMarker.remove();
              AreaTextView.setText("");
+             AverageText.setText("");
+             Std_DevText.setText("");
+             VarianceText.setText("");
     	  }
     	}
     	break;
@@ -223,57 +245,58 @@ public class MainActivity extends FragmentActivity {
     	double area = SphericalUtil.computeArea(points);
     	if (area != 0 && points.get(0).equals(points.get(points.size() - 1))) {
     		//Toast.makeText(this, String.format("Area: %.2e sq meters", area), Toast.LENGTH_LONG).show();
+    		double arces;
+    		arces = area*0.000247;
 
-    		AreaTextView.setText( String.format("Area: %.2e sq meters", area));
+    		AreaTextView.setText( String.format("Area: %.2e sq meters || %.2e acres" ,area,arces));
     	} else {
     		Toast.makeText(this, "Complete polygon to compute area.", Toast.LENGTH_SHORT).show();
     	}
     	break;
     	
       case R.id.average:
-    	  int[] pixels;
-      	  Bitmap vMap = BitmapFactory.decodeResource(getResources(), R.drawable.w_overlay);
-      	  int height = vMap.getHeight();
-      	  int width = vMap.getWidth();
-      	  
-      	  Projection projection = googleMap.getProjection();
-      	  Point point = projection.toScreenLocation(overlayLocation);
-      	  double sum = 0;
-      	  
-      	  pixels = new int[height * width];   
-      	  vMap.getPixels(pixels, 0, width, 0, 0, width, height);
+    	  if (polylines.size() >= 3){
+    		  double counter[] = new double[3];
+    	      counter = t_Statistics();
+    	      double average_2 = counter[0];
+    	      
+    	      AverageText.setText(String.format("Average: %.2e", average_2));
 
-      	  for (int y = 0; y < height; y++) {
-      		  for(int x = 0; x < width; x++) {
-      			  point.x = x;
-      			  point.y = y;
-      			  LatLng position = projection.fromScreenLocation(point);
-    			  Log.e(TAG, String.format("%f", sum));
-    			  if (PolyUtil.containsLocation(position, points, true)) {
-      				int index = y * width + x;
-      			    int R = (pixels[index] >> 16) & 0xff;
-      			    int G = (pixels[index] >> 8) & 0xff;
-      			    int B = pixels[index] & 0xff;
-      			    sum += (R + G + B);
-      			    if (sum != 0) {
-      			    	MarkerOptions inMarkerOptions = new MarkerOptions();
-                		inMarkerOptions.position(position);
-                		inMarker = googleMap.addMarker(inMarkerOptions);
-      			    }
-      			    pixels[index] = 0xff000000 | (R << 16) | (G << 8)| B;
-      			  }
-      		  }
-      	   }
-      	  
-      	   AverageText.setText(String.format("Average: %.2e", sum / (width * height)));
-      	   //Toast.makeText(this, String.format("Average: %.2e", sum / (width * height)), Toast.LENGTH_LONG).show();
-      	   
-      	   
-      	   break;
+    	  }
 
     	  
+      	  break;
+      	   
+      case R.id.standard_deviation:
+     	  if (polylines.size() >= 3){
+     		  double counter_3[] = new double[3];
+     		  counter_3 = t_Statistics();
+     		  double std_dev2  = counter_3[2];
+     		
+     		  Std_DevText.setText(String.format("Standard Deviation: %.2e ",std_dev2));
+     	  }
+    	  
+    	  break;
+    	  
+    	  
+      case R.id.variance:
+    	  if (polylines.size() >= 3){
+    		  
+    		  double counter_2[] = new double[3];
+    		  counter_2 = t_Statistics();
+    		  double variance_2 = counter_2[1];
+
+    		  VarianceText.setText(String.format("Variance: %.2e ",variance_2));
+    		  
+    	  }
+    	  
+    	  break;
+    	  
+
+    	  
+    	  
       case R.id.action_settings: // action with ID action_settings was selected
-          Toast.makeText(this, "Settings selected", Toast.LENGTH_SHORT)
+    	  Toast.makeText(this, "Settings selected", Toast.LENGTH_SHORT)
               .show();
           break;
           
@@ -282,5 +305,92 @@ public class MainActivity extends FragmentActivity {
         }
       return true;
     }
-}
+    
+
+  //Does all of the calculations
+      double[] t_Statistics(){
+          int[] pixels;
+
+
+          double[] counter = new double[3];
+          double sum = 0;
+
+          
+          Bitmap vMap = BitmapFactory.decodeResource(getResources(), R.drawable.yield_overlay);
+          int height = vMap.getHeight();
+          int width = vMap.getWidth();
+            
+          Projection projection = googleMap.getProjection();
+          Point point = projection.toScreenLocation(overlayLocation);
+          
+
+          pixels = new int[width*height]; 
+          double[] p_array = new double [height * width];
+          vMap.getPixels(pixels, 0, width, 0, 0, width, height);
+
+
+          for (int y = 0; y < height; y++) {
+              for(int x = 0; x < width; x++) {
+                   point.x = x;
+                   point.y = y;
+                  
+
+                   LatLng position = projection.fromScreenLocation(point);
+                   Log.e(TAG, String.format("%f", sum));
+
+
+                   if (PolyUtil.containsLocation(position, points, true)) {
+                      int index = y * width + x;
+                      int A = (pixels[index] >> 24) & 0xff;
+                      int R = (pixels[index] >> 16) & 0xff;
+                      int G = (pixels[index] >> 8) & 0xff;
+                      int B = pixels[index] & 0xff;
+                      sum += (A + R + G + B);
+                      for(int i = 0; i < pixels.length; i++){
+                          p_array[i] = sum;
+      
+                      }
+
+                      if (sum != 0) {
+                          MarkerOptions inMarkerOptions = new MarkerOptions();
+                          inMarkerOptions.position(position);
+                          inMarker = googleMap.addMarker(inMarkerOptions);
+                         }
+                      Log.e(Value, String.format("%f", R));
+                      pixels[index] = 0xff000000 | (R << 16) | (G << 8)| B;
+                      
+                    }
+                   
+                }
+             }
+          //Mean
+          double average = sum / p_array.length;
+
+          //Variance
+          double variance = 0;
+          for(int i = 0; i<p_array.length; i++){
+              variance += Math.pow(p_array[i]-average,2);
+          }
+          //Standard Deviation
+          double std_dev;
+          std_dev = Math.sqrt(variance);
+          
+          //Mode
+
+
+          //Array Values
+          counter[0] = average;
+          counter[1] = variance;
+          counter[2] = std_dev;
+
+          
+      
+          return counter;
+      }
+      
+      
+  }
+    
+
+
 
