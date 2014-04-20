@@ -14,17 +14,7 @@
         android:orderInCategory="100"
         android:showAsAction="never"
         android:title="@string/action_settings"/>
-    <item
-        android:id="@+id/polygon_draw"
-        android:icon="@drawable/polygon_tool"
-        android:title="@string/polygon_draw"
-        android:showAsAction="always" >
-        <menu
-            android:orderInCategory="1"
-            android:id="@+id/circle"
-            android:showAsAction="ifRoom|withText"
-            android:title="@string/circle" />
-        </item>
+   
     
 
 </menu>

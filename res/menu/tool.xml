@@ -22,9 +22,9 @@
           android:title="@string/variance" />
        <item 
           android:orderInCategory="4"
-          android:id="@+id/action_pixel"
+          android:id="@+id/mode"
           android:showAsAction="ifRoom|withText"
-          android:title="@string/action_pixel" />
+          android:title="@string/mode" />
 
        
     </menu>

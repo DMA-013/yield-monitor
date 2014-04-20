@@ -21,7 +21,7 @@
 
         <TextView
             android:id="@+id/areaValue"
-            android:layout_width="205dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:fontFamily="sans-serif-thin"
             android:textAppearance="?android:attr/textAppearanceMedium"
@@ -29,7 +29,23 @@
 
         <TextView
             android:id="@+id/average"
-            android:layout_width="162dp"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-thin"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@android:color/black" />
+
+        <TextView
+            android:id="@+id/variance"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-thin"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@android:color/black" />
+
+        <TextView
+            android:id="@+id/standard_deviation"
+            android:layout_width="200dp"
             android:layout_height="wrap_content"
             android:fontFamily="sans-serif-thin"
             android:textAppearance="?android:attr/textAppearanceMedium"

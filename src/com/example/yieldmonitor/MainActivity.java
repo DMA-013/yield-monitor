@@ -327,28 +327,29 @@ public class MainActivity extends FragmentActivity {
           pixels = new int[width*height]; 
           double[] p_array = new double [height * width];
           vMap.getPixels(pixels, 0, width, 0, 0, width, height);
+          
 
-
+          
           for (int y = 0; y < height; y++) {
               for(int x = 0; x < width; x++) {
                    point.x = x;
                    point.y = y;
                   
-
                    LatLng position = projection.fromScreenLocation(point);
                    Log.e(TAG, String.format("%f", sum));
 
-
                    if (PolyUtil.containsLocation(position, points, true)) {
                       int index = y * width + x;
+                      
                       int A = (pixels[index] >> 24) & 0xff;
                       int R = (pixels[index] >> 16) & 0xff;
                       int G = (pixels[index] >> 8) & 0xff;
                       int B = pixels[index] & 0xff;
+
+
                       sum += (A + R + G + B);
                       for(int i = 0; i < pixels.length; i++){
                           p_array[i] = sum;
-      
                       }
 
                       if (sum != 0) {
@@ -356,7 +357,7 @@ public class MainActivity extends FragmentActivity {
                           inMarkerOptions.position(position);
                           inMarker = googleMap.addMarker(inMarkerOptions);
                          }
-                      Log.e(Value, String.format("%f", R));
+                      
                       pixels[index] = 0xff000000 | (R << 16) | (G << 8)| B;
                       
                     }
